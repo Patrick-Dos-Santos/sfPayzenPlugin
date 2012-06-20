@@ -1,0 +1,173 @@
+# sfPayzen plugin (for symfony 1.4) #
+
+The `sfPayzenPlugin` is a symfony plugin that provides basic features to use
+the Payzen payment plateform
+
+It gives you the classes and the component to create a "Pay" button on your
+website's pages.
+
+This plugin has been tested for the 2.8 version of Payzen API.
+
+Note that this plugin does not provide persistance in your database. See
+sfDoctrinePayzenPlugin for a Doctrine implementation for Payzen.
+Since there is no database persistance, the generation of the vads_trans_id is
+not provided by this plugin.
+
+## Installation ##
+
+  * Install the plugin (via a package) : 
+
+        symfony plugin:install sfPayzenPlugin
+
+  * Install the plugin (via a Subversion checkout) : 
+  
+        svn co http//svn.symfony-project.com/plugins/sfPayzenPlugin/trunk plugins/sfPayzenPlugin
+
+  * Activate the plugin in the `config/ProjectConfiguration.class.php` : 
+  
+        [php]
+        class ProjectConfiguration extends sfProjectConfiguration
+        {
+          public function setup()
+          {
+            $this->enablePlugins(array(
+              'sfPayzenPlugin', 
+            ));
+          }
+        }
+
+  * Enable the module in your `settings.yml` :
+
+        [yml]    
+        all:
+        .settings:
+            enabled_modules:      [default, sfPayzenPlugin]
+
+  * Clear you cache
+
+        symfony cc
+
+### Using the plugin ###
+
+The easiest way to use the plugin is to configure it in the app.yml
+
+  * Set your parameters in app.yml (see the Payzen documentation for more 
+    information) :
+
+        all:
+            sf_payzen_plugin:
+              options:
+                vads_site_id: your_payzen_id
+                certificate: your_certificate
+                vads_ctx_mode: TEST
+                vads_currency: 978 #(euro)
+                vads_action_mode: INTERACTIVE
+
+  * Configure the payment in your actions.class.php :
+      
+        [php]
+        public function executeMyAction(sfWebRequest $request)
+        {
+            [...]
+
+            $this->options = array(
+            'vads_amount' => 100000,
+            'vads_trans_id' => $vadsTransId,
+            );
+        }
+    
+  * Add the component in your template :
+
+        [php]
+        <?php include_component('SfPayzen', 'payzenForm', array('options'=>$options, 'payzen_version'=>'2_8')) ?>
+    
+   That's it. You should see a "Pay" button on your page
+
+## app.yml VS direct configuration ##
+
+Although in most cases app.yml configuration might be sufficient, you can 
+override all the options in your controller. 
+
+Note that you can use both way at the same time. 
+
+By default, the plugin uses the option specified in the option array. If
+the option is not set, it will check in the app.yml. Then if the option is
+still not set, and if it's a required option, the plugin will use the 
+default Payzen value. Finally it will throw an Exception if there 
+is no default value. 
+
+  * Overriding the options :
+
+        [php]
+        <?php
+
+        public function executeMyAction(sfWebRequest $request)
+        {
+            [...]
+
+            $this->options = array(
+            'certificate'=> your_certificate
+            'vads_ctx_mode'=> 'PROD'
+            'vads_action_mode'=> 'INTERACTIVE'
+            'vads_amount' => '100000',
+            'vads_trans_id' => $vadsTransId,
+            ...,
+            );
+        }
+
+## Using sfPayzenPlugin without the component ##
+
+If you don't want to use the sfPayzenPlugin's component, you can set all
+you need to work with Payzen directly in the sfPayzenPayment class.
+
+    
+  * In your controller or custom class :
+        
+        [php]
+        <?php
+
+        public function myFunction()
+        {
+            [...]
+
+            $options = array(
+            'certificate'=> your_certificate
+            'vads_ctx_mode'=> sfPayzenPayment_2_8::VADS_CTX_MODE_TEST
+            'vads_action_mode'=> VADS_ACTION_MODE_INTERACTIVE
+            'vads_amount' => '100000',
+            'vads_trans_id' => $vadsTransId,
+            ...,
+            );
+            
+            
+            $payment = new sfPayzenPayment_2_8($options);
+            $signature = $payment->getSignature();
+            
+            //You can still use the plugin's form
+            $form = new sfPayzenPaymentForm($payment);
+        }
+
+## Extending sfPayzenPlugin ##
+
+If you want to do something with each sfPayzenPayment created, you can 
+use the built-in symfony event manager. Each time a sfPayzenPayment is 
+created, it notifies the event manager.
+
+  * In your ProjectConfiguration.class.php add :
+
+        [php]
+        $this->dispatcher->connect('sf_payzen_plugin.new_payment', array('myListenerClass', 'listenToPayzenNewPayment'));
+
+  * In your myListener.class.php :
+
+        [php]
+        <?php
+
+        class myListener
+        {
+            static public function listenToPayzenNewPayment(sfEvent $event)
+            {
+                $sfPayzenPayment = $event->getSubject();
+                //Do something with the payment
+            }
+        }
