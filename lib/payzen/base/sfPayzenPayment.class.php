@@ -25,6 +25,7 @@ abstract class sfPayzenPayment
      */
     public function __construct($options = array())
     {
+        $this->addRequiredOption('certificate');
         $this->configure($options);
 
         if (!$this->payzenApiVersion)
@@ -83,6 +84,15 @@ abstract class sfPayzenPayment
     }
 
     /**
+     * Returns an array of required options
+     * @return array The required option 
+     */
+    public function getRequiredOptions()
+    {
+        return $this->requiredOptions;
+    }
+    
+    /**
      * Sets the payzen API version
      * @param string $version The Payzen API version 
      */
@@ -90,13 +100,34 @@ abstract class sfPayzenPayment
     {
         $this->payzenApiVersion = $version;
     }
+    
+    /**
+     * Gets the payzen API version
+     * @return string The payzen API version 
+     */
+    public function getPayzenApiVersion()
+    {
+        return $this->payzenApiVersion;
+    }
 
     /**
      * Generates the signature for the current payment.
      *
-     * See payzen documentation for more information.
+     * To calculate the signature all the fields starting with "vads" are sorted
+     * in alphabetical order. Each fields' value is added to a string followed 
+     * by a +.
+     * The Payzen certificate is also added at the end of the string.
      * 
-     * @return string The signature crypted in sha1
+     * Example :
+     * 
+     * with the fields vads_a = 'a', vads_b = 'b', vads_c = 'c',
+     * and certificate = 'my_certificate', the string would be:
+     *
+     * 'a+b+c+my_certificate'
+     * 
+     * The actual signature is encrypted in sha1
+     * 
+     * @return string The signature encrypted in sha1
      */
     public function getSignature()
     {
@@ -115,7 +146,7 @@ abstract class sfPayzenPayment
         }
 
         //Adding certificate at the end of the signature
-        $signatureContent .= $this->certificate;
+        $signatureContent .= $this->options['certificate'];
         return sha1($signatureContent);
     }
 

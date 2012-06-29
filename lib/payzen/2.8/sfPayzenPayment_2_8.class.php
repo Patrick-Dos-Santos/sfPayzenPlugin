@@ -87,8 +87,6 @@ class sfPayzenPayment_2_8 extends sfPayzenPayment
 
         $this->setPayzenApiVersion(self::PAYZEN_API_VERSION);
 
-        $this->addRequiredOption('certificate');
-
         $this->addRequiredOption('vads_amount');
         $this->addRequiredOption('vads_site_id');
         $this->addRequiredOption('vads_trans_id');
