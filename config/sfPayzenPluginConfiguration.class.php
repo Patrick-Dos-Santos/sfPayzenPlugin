@@ -15,5 +15,6 @@ class sfPayzenPluginConfiguration extends sfPluginConfiguration
    */
   public function initialize()
   {
+      
   }
 }
