@@ -131,8 +131,7 @@ abstract class sfPayzenPayment
      */
     public function getSignature()
     {
-        $columns = $this->toArray();
-        ksort($columns);
+        $columns = $this->getVadsArray();
 
         $signatureContent = '';
 
@@ -167,7 +166,24 @@ abstract class sfPayzenPayment
         }
         return $a;
     }
-
+    
+    /**
+     * Gets the vads options sorted
+     * @return array An array of vads options sorted 
+     */
+    public function getVadsArray()
+    {
+        $vadsArray = $this->toArray();
+        ksort($vadsArray);
+        foreach($vadsArray as $key=>$value)
+        {
+             if (substr($key, 0, 5) !== 'vads_') {
+                unset($vadsArray[$key]);
+            }
+        }
+        return $vadsArray;
+    }
+    
     /**
      * Magic method for getters.
      * @param string $name The name of the value to get

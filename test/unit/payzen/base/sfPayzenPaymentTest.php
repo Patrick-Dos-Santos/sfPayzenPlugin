@@ -120,8 +120,6 @@ $t->is($mockEventListener->wasEventCaught(), true, '->__construct() a "sf_payzen
 
 //configure()
 // Since configure is called in the __construct no need to test it
- 
- 
 //addOption()
 $t->diag('->addOption()');
 
@@ -243,3 +241,23 @@ $t->is($payment->required_option, 'new_value', '->_set() sets an option\'s value
 
 $payment->fakeOption = 'fake_option_value';
 $t->is($payment->getFakeOption(), 'fake_option_value', '->_set() calls a setFieldName() method for a field called "fieldName"');
+
+//->getVadsArray()
+$t->diag('->getVadsArray()');
+
+$payment = new sfPayzenPaymentInstance(array(
+            'required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment->addOption('vads_a', 'a');
+$payment->addOption('vads_c', 'c');
+$payment->addOption('vads_b', 'b');
+$payment->addOption('certificate', 'my_certificate');
+$payment->addOption('non_vads_field', 'non_vads_value');
+$payment->addOption('null_field');
+
+$expectedArray = array(
+    'vads_a' => 'a',
+    'vads_b' => 'b',
+    'vads_c' => 'c',
+);
+
+$t->is_deeply($payment->getVadsArray(), $expectedArray, '->getVadsArray() returns an array with the "vads" values sorted');
