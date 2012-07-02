@@ -9,6 +9,7 @@
  */
 class sfPayzenPaymentForm extends sfForm
 {
+
     /**
      * Builds the form.
      * 
@@ -24,12 +25,12 @@ class sfPayzenPaymentForm extends sfForm
 
         //We do not want the CSRF token to be sent to Payzen plateform
         unset($this['_csrf_token']);
-        
-        foreach ($payment->toArray() as $name => $value) {
-            if (substr($name, 0, 5) == 'vads_') {
-                $this->setWidget($name, new sfWidgetFormInputHidden(array('default' => $value)));
-            }
+
+        foreach ($payment->getVadsArray() as $name => $value)
+        {
+            $this->setWidget($name, new sfWidgetFormInputHidden(array('default' => $value)));
         }
         $this->setWidget('signature', new sfWidgetFormInputHidden(array('default' => $payment->getSignature())));
     }
+
 }

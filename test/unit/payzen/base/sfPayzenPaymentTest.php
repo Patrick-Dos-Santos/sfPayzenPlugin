@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . '/../../../../lib/payzen/base/sfPayzenPayment.c
 /**
  * Instanciation of sfPayzenPayment without the payzen api version set in the configure() 
  */
-class sfPayzenPaymentInstanceWithoutVersion extends sfPayzenPayment
+class sfPayzenPaymentStubWithoutVersion extends sfPayzenPayment
 {
     
 }
@@ -14,7 +14,7 @@ class sfPayzenPaymentInstanceWithoutVersion extends sfPayzenPayment
 /**
  * Instanciation of sfPayzenPayment 
  */
-class sfPayzenPaymentInstance extends sfPayzenPayment
+class sfPayzenPaymentStub extends sfPayzenPayment
 {
 
     private $fakeOption = null;
@@ -81,7 +81,7 @@ $t->is($mockEventListener->wasEventCaught(), false, '->__construct() no "sf_payz
 
 try
 {
-    $payment = new sfPayzenPaymentInstanceWithoutVersion();
+    $payment = new sfPayzenPaymentStubWithoutVersion();
     $t->fail('->__construct() throws a sfException if the payzen api version is not set');
 } catch (sfException $e)
 {
@@ -91,7 +91,7 @@ try
 
 try
 {
-    $payment = new sfPayzenPaymentInstance(array('unknown_key' => 'unknown_value'));
+    $payment = new sfPayzenPaymentStub(array('unknown_key' => 'unknown_value'));
     $t->fail('->__construct() throws a InvalidArgumentException if an option is not supported');
 } catch (InvalidArgumentException $e)
 {
@@ -101,7 +101,7 @@ try
 
 try
 {
-    $payment = new sfPayzenPaymentInstance(array());
+    $payment = new sfPayzenPaymentStub(array());
     $t->fail('->__construct() throws a RuntimeException if a mandatory option is not set');
 } catch (RuntimeException $e)
 {
@@ -109,10 +109,10 @@ try
     $t->is($mockEventListener->wasEventCaught(), false, '->__construct() no "sf_payzen_plugin.new_payment" if an exception is thrown');
 }
 
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $t->is($payment->__get('option_name'), 'option_value', '->__construct() if an option is not passed in parameter it is set to the default value');
 
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate', 'option_name' => 'passed_option_value'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate', 'option_name' => 'passed_option_value'));
 $t->is($payment->__get('option_name'), 'passed_option_value', '->__construct() if an option is passed in parameter it is set to the passed value');
 
 $t->is($mockEventListener->wasEventCaught(), true, '->__construct() a "sf_payzen_plugin.new_payment" event is thrown when instanciating a sfPayzenPayment');
@@ -123,12 +123,12 @@ $t->is($mockEventListener->wasEventCaught(), true, '->__construct() a "sf_payzen
 //addOption()
 $t->diag('->addOption()');
 
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $payment->addOption('new_option');
 
 $t->is($payment->__get('new_option'), null, '->addOption() add an empty option when no option value is passed');
 
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $payment->addOption('new_option', 'new_value');
 
 $t->is($payment->__get('new_option'), 'new_value', '->addOption() sets an option to the given value');
@@ -136,11 +136,11 @@ $t->is($payment->__get('new_option'), 'new_value', '->addOption() sets an option
 //getRequiredOptions(), addRequiredOptions
 $t->diag('->getRequiredOptions()');
 
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $t->isa_ok($payment->getRequiredOptions(), 'array', '->getRequiredOptions() returns an array');
 
 $t->diag('->addRequiredOption()');
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $payment->addRequiredOption('required_option2');
 
 $expectedRequiredOptions = array('certificate', 'required_option', 'required_option2');
@@ -149,19 +149,19 @@ $t->is_deeply($payment->getRequiredOptions(), $expectedRequiredOptions, '->addRe
 
 //getPayzenApiVersion()
 $t->diag('->getPayzenApiVersion()');
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $t->isa_ok($payment->getPayzenApiVersion(), 'string', '->getPayzenApiVersion() returns a string');
 
 //setPayzenApiVersion()
 $t->diag('->setPayzenApiVersion()');
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $payment->setPayzenApiVersion('9.9');
 $t->is($payment->getPayzenApiVersion(), '9.9', '->setPayzenApiVersion() sets the Payzen API version');
 
 
 //getSignature()
 $t->diag('->getSignature()');
-$payment = new sfPayzenPaymentInstance(array(
+$payment = new sfPayzenPaymentStub(array(
             'required_option' => 'required_value', 'certificate' => 'my_certificate'));
 
 $payment->addOption('vads_a', 'a');
@@ -178,7 +178,7 @@ $t->is($payment->getSignature(), $expectedSignature, '->getSignature() generates
 
 //toArray()
 $t->diag('->toArray()');
-$payment = new sfPayzenPaymentInstance(array(
+$payment = new sfPayzenPaymentStub(array(
             'required_option' => 'required_value', 'certificate' => 'my_certificate'));
 
 $payment->addOption('vads_a', 'a');
@@ -206,7 +206,7 @@ $t->is_deeply(
 
 //->__get()
 $t->diag('->__get()');
-$payment = new sfPayzenPaymentInstance(array(
+$payment = new sfPayzenPaymentStub(array(
             'required_option' => 'required_value',
             'certificate' => 'my_certificate'));
 
@@ -226,7 +226,7 @@ $t->is($payment->method, 'getMethod() call successfull', '->__get() calls a getF
 
 //->__set()
 $t->diag('->__set()');
-$payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
+$payment = new sfPayzenPaymentStub(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 
 try
 {
@@ -245,7 +245,7 @@ $t->is($payment->getFakeOption(), 'fake_option_value', '->_set() calls a setFiel
 //->getVadsArray()
 $t->diag('->getVadsArray()');
 
-$payment = new sfPayzenPaymentInstance(array(
+$payment = new sfPayzenPaymentStub(array(
             'required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $payment->addOption('vads_a', 'a');
 $payment->addOption('vads_c', 'c');
