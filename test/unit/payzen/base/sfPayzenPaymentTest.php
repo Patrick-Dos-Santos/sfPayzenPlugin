@@ -120,6 +120,8 @@ $t->is($mockEventListener->wasEventCaught(), true, '->__construct() a "sf_payzen
 
 //configure()
 // Since configure is called in the __construct no need to test it
+ 
+ 
 //addOption()
 $t->diag('->addOption()');
 
@@ -131,7 +133,7 @@ $t->is($payment->__get('new_option'), null, '->addOption() add an empty option w
 $payment = new sfPayzenPaymentInstance(array('required_option' => 'required_value', 'certificate' => 'my_certificate'));
 $payment->addOption('new_option', 'new_value');
 
-$t->is($payment->__get('new_option'), 'new_value', '->addOption() add an empty option when no option value is passed');
+$t->is($payment->__get('new_option'), 'new_value', '->addOption() sets an option to the given value');
 
 //getRequiredOptions(), addRequiredOptions
 $t->diag('->getRequiredOptions()');
