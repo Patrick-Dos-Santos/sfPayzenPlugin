@@ -10,11 +10,13 @@
  */
 class sfPayzenPluginConfiguration extends sfPluginConfiguration
 {
-  /**
-   * @see sfPluginConfiguration
-   */
-  public function initialize()
-  {
-      
-  }
+
+    /**
+     * @see sfPluginConfiguration
+     */
+    public function initialize()
+    {
+        $this->dispatcher->connect('routing.load_configuration', array('sfPayzenRouting', 'listenToRoutingLoadConfigurationEvent'));
+    }
+
 }
