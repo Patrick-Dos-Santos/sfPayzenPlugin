@@ -5,7 +5,7 @@
  *
  * @package    sfPayzenPaymentPlugin
  * @subpackage test
- * @author     Patrick Dos Santos <patrick.dos-santos@solution-interactive.com>
+ * @author     Patrick Dos Santos <patrick.dos-santos [at] solution-interactive.com>
  */
 class sfPayzenPaymentReturnForm extends sfForm
 {
@@ -22,6 +22,9 @@ class sfPayzenPaymentReturnForm extends sfForm
     {
         parent::__construct($defaults, $options, $CSRFSecret);
 
+        //We do not want the CSRF token to be sent to Payzen plateform
+        unset($this['_csrf_token']);
+        
         $this->setWidget('vads_action_mode', new sfWidgetFormInput());
         $this->setWidget('vads_amount', new sfWidgetFormInput());
         $this->setWidget('vads_auth_result', new sfWidgetFormInput());
@@ -35,6 +38,7 @@ class sfPayzenPaymentReturnForm extends sfForm
         $this->setWidget('vads_ctx_mode', new sfWidgetFormInput());
         $this->setWidget('vads_extra_result', new sfWidgetFormInput());
         $this->setWidget('vads_payment_config', new sfWidgetFormInput());
+        $this->setWidget('Signature', new sfWidgetFormInput());
         $this->setWidget('vads_site_id', new sfWidgetFormInput());
         $this->setWidget('vads_trans_date', new sfWidgetFormInput());
         $this->setWidget('vads_trans_id', new sfWidgetFormInput());

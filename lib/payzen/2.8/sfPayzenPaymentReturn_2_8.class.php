@@ -1,23 +1,22 @@
 <?php
 
 /**
- * sfPayzenPayment_2_8 represents a payment for the Payzen 2.8 API
+ * sfPayzenPaymentReturn_2_8 represents a payment return from Payzen 2.8 API
  * 
  * @package    sfPayzenPaymentPlugin
  * @subpackage payzen
- * @author     Patrick Dos Santos <patrick.dos-santos@solution-interactive.com>
- * @see sfPayzenPayment
+ * @author     Patrick Dos Santos <patrick.dos-santos [at] solution-interactive.com>
+ * @see sfPayzenPaymentReturn
  */
 class sfPayzenPaymentReturn_2_8 extends sfPayzenPaymentReturn
 {
-
     /**
      * @see sfPayzenPaymentReturn
      */
     public function configure($fields = array())
     {
         parent::configure($fields);
-
+        $this->addField('Signature');
         $this->addField('vads_amount');
         $this->addField('vads_action_mode');
         $this->addField('vads_amount');
@@ -69,6 +68,7 @@ class sfPayzenPaymentReturn_2_8 extends sfPayzenPaymentReturn
         $this->addField('vads_threeds_sign_valid');
 
         //required fields
+        $this->validatorSchema['Signature'] = new sfValidatorString(array('required' => true));
         $this->validatorSchema['vads_action_mode'] = new sfValidatorEqual(array('value' => $this->payment->__get('vads_action_mode'), 'required' => true, 'strict' => true));
         $this->validatorSchema['vads_amount'] = new sfValidatorEqual(array('value' => $this->payment->__get('vads_amount'), 'required' => true, 'strict' => true));
         $this->validatorSchema['vads_auth_mode'] = new sfValidatorChoice(array('choices' => array('MARK', 'FULL'), 'required' => true));
@@ -122,5 +122,4 @@ class sfPayzenPaymentReturn_2_8 extends sfPayzenPaymentReturn
         $this->addMatchPaymentOrDefaultValidator('vads_expiry_month', new sfValidatorInteger(array('max' => 99)));
         $this->addMatchPaymentOrDefaultValidator('vads_expiry_year', new sfValidatorInteger(array('max' => 9999)));
     }
-
 }

@@ -5,7 +5,7 @@
  *
  * @package    sfPayzenPaymentPlugin
  * @subpackage payzen
- * @author     Patrick Dos Santos <patrick.dos-santos@solution-interactive.com>
+ * @author     Patrick Dos Santos <patrick.dos-santos [at] solution-interactive.com>
  */
 abstract class sfPayzenPaymentReturn
 {
@@ -25,12 +25,10 @@ abstract class sfPayzenPaymentReturn
         $this->configure($fields);
         
         $this->fields = array_merge($this->fields, $fields);
-        $this->validate();
-
 
         ProjectConfiguration::getActive()
                 ->getEventDispatcher()
-                ->notify(new sfEvent($this, 'sf_payzen_plugin.new_payment'));
+                ->notify(new sfEvent($this, 'sf_payzen_plugin.payment_return'));
     }
 
     public function validate()
@@ -76,24 +74,9 @@ abstract class sfPayzenPaymentReturn
      * 
      * @return string The signature encrypted in sha1
      */
-    public function getSignature()
+    public function checkSignature($checkAgainst)
     {
-        $columns = $this->getVadsArray();
-
-        $signatureContent = '';
-
-        //Adding each 'vads' field and its value separated by '+'
-        foreach ($columns as $key => $value)
-        {
-            if (substr($key, 0, 5) == 'vads_')
-            {
-                $signatureContent .= $value . "+";
-            }
-        }
-
-        //Adding certificate at the end of the signature
-        $signatureContent .= $this->options['certificate'];
-        return sha1($signatureContent);
+        return $this->fields['Signature'] === $checkAgainst;
     }
 
     /**
@@ -104,7 +87,7 @@ abstract class sfPayzenPaymentReturn
     public function toArray()
     {
         $a = array();
-        foreach ($this->options as $column => $value)
+        foreach ($this->fields as $column => $value)
         {
             if (null != $value)
             {
@@ -145,11 +128,11 @@ abstract class sfPayzenPaymentReturn
         {
             return call_user_func(array($this, $getter));
         }
-        if (!array_key_exists($name, $this->options))
+        if (!array_key_exists($name, $this->fields))
         {
             throw new InvalidArgumentException(sprintf('The %s option is not supported', $name));
         }
-        return $this->options[$name];
+        return $this->fields[$name];
     }
 
     /**
@@ -166,11 +149,11 @@ abstract class sfPayzenPaymentReturn
             call_user_func(array($this, $setter), $value);
         } else
         {
-            if (!array_key_exists($name, $this->options))
+            if (!array_key_exists($name, $this->fields))
             {
                 throw new InvalidArgumentException(sprintf('The %s option is not supported', $name));
             }
-            $this->options[$name] = $value;
+            $this->fields[$name] = $value;
         }
     }
 

@@ -5,7 +5,7 @@
  *
  * @package    sfPayzenPaymentPlugin
  * @subpackage payzen
- * @author     Patrick Dos Santos <patrick.dos-santos@solution-interactive.com>
+ * @author     Patrick Dos Santos <patrick.dos-santos [at] solution-interactive.com>
  */
 class sfPayzenPaymentForm extends sfForm
 {

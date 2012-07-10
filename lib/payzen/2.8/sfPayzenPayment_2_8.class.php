@@ -5,35 +5,36 @@
  * 
  * @package    sfPayzenPaymentPlugin
  * @subpackage payzen
- * @author     Patrick Dos Santos <patrick.dos-santos@solution-interactive.com>
+ * @author     Patrick Dos Santos <patrick.dos-santos [at] solution-interactive.com>
  * @see sfPayzenPayment
  */
 class sfPayzenPayment_2_8 extends sfPayzenPayment
 {
     //Payzen api version
+
     const PAYZEN_API_VERSION = '2_8';
-    
+
     //vads_action_mode
     const
             VADS_ACTION_MODE_SILENT = 'SILENT',
             VADS_ACTION_MODE_INTERACTIVE = 'INTERACTIVE';
-    
+
     //vads_contracts
     const
             VADS_CONTRACTS_AMEX = 'AMEX',
             VADS_CONTRACTS_CB = 'CB';
-    
+
     //vads_ctx_mode
     const
             VADS_CTX_MODE_TEST = 'TEST',
             VADS_CTX_MODE_PRODUCTION = 'PRODUCTION';
-    
+
     //vads_currency. List of all currencies : http://www.currency-iso.org/iso_index/isVADS_CURRENCY_GBPo_tables/iso_tables_a1.htm
     const
             VADS_CURRENCY_EURO = '978',
             VADS_CURRENCY_USD = '840',
             VADS_CURRENCY_GBP = '826';
-    
+
     //vads_language
     const
             VADS_LANGUAGE_DE = 'de', //Deutsch
@@ -44,7 +45,7 @@ class sfPayzenPayment_2_8 extends sfPayzenPayment
             VADS_LANGUAGE_IT = 'it', //Italian
             VADS_LANGUAGE_JP = 'jp', //Japanese
             VADS_LANGUAGE_PT = 'pt'; //Portuguese
-    
+   
     //vads_payment_cards
     const
             VADS_PAYMENT_CARDS_AMEX = 'AMEX',
@@ -53,28 +54,28 @@ class sfPayzenPayment_2_8 extends sfPayzenPayment
             VADS_PAYMENT_CARDS_VISA = 'VISA',
             VADS_PAYMENT_CARDS_MAESTRO = 'MAESTRO',
             VADS_PAYMENT_CARDS_ECARD = 'E-CARTEBLEUE';
-    
+
     //vads_page_action
     const
             VADS_PAGE_ACTION_PAYMENT = 'SINGLE';
-    
+
     //vads_payment_config
     const
             VADS_PAYMENT_CONFIG_SINGLE = 'SINGLE',
             VADS_PAYMENT_CONFIG_MULTI = 'MULTI';
-    
+
     //vads_return_mode
     const
             VADS_RETURN_MODE_NONE = 'NONE',
             VADS_RETURN_MODE_GET = 'GET',
             VADS_RETURN_MODE_POST = 'POST';
-    
-   //vads_validation_mode
+
+    //vads_validation_mode
     const
             VADS_VALIDATION_MODE_AUTO = '0',
             VADS_VALIDATION_MODE_MANUAL = '1';
-    
-   //vads_version
+
+    //vads_version
     const
             VADS_VERSION_V2 = 'V2';
 
@@ -86,6 +87,13 @@ class sfPayzenPayment_2_8 extends sfPayzenPayment
         parent::configure($options);
 
         $this->setPayzenApiVersion(self::PAYZEN_API_VERSION);
+
+        if (!key_exists('vads_trans_id', $options))
+        {
+            $event = ProjectConfiguration::getActive()
+                            ->getEventDispatcher()->filter(new sfEvent($this, 'sf_payzen_plugin.filter_vads_trans_id'), null);
+            $this->addOption('vads_trans_id', $event->getReturnValue());
+        }
 
         $this->addRequiredOption('vads_amount');
         $this->addRequiredOption('vads_site_id');
