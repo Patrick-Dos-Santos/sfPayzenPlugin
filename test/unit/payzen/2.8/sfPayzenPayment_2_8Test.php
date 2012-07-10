@@ -21,7 +21,6 @@ class mockEventListener
     {
         return $this->eventCaught;
     }
-
 }
 
 $t = new lime_test(null, new lime_output_color());
